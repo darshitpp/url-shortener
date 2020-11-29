@@ -8,13 +8,11 @@ import dev.darshit.urlshortener.utils.UUIDUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Service("hash")
 public class HashStrategy implements UrlShorteningStrategy {
 
     private final RedisUrlOperations redisUrlOperations;
-    private static final AtomicLong atomicLong = new AtomicLong();
 
     public HashStrategy(RedisUrlOperations redisUrlOperations) {
         this.redisUrlOperations = redisUrlOperations;
@@ -33,13 +31,13 @@ public class HashStrategy implements UrlShorteningStrategy {
         return Optional.of(path);
     }
 
-    public static String getUniqueNumberString(String originalUrl) {
+    private String getUniqueNumberString(String originalUrl) {
         int uuidHashCode = UUIDUtils.uuid().hashCode();
-        long atomicLongValue = atomicLong.incrementAndGet();
+        long counter = redisUrlOperations.incrementCounterForShortUrl();
         long currentTime = System.currentTimeMillis();
         long originalUrlHashCode = originalUrl.hashCode();
 
-        String uniqueString = String.valueOf(uuidHashCode) + currentTime + atomicLongValue + originalUrlHashCode;
+        String uniqueString = String.valueOf(uuidHashCode) + currentTime + counter + originalUrlHashCode;
         return StringUtils.replace(uniqueString, "-", "");
     }
 }

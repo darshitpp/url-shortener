@@ -7,6 +7,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Optional;
@@ -15,16 +16,15 @@ import java.util.Optional;
 @SpringBootTest
 class WordStrategyTest {
 
-    private final WordStrategy wordStrategy;
-    private final Fetcher fetcher;
-    private final RedisUrlOperations redisUrlOperations;
-    public static final String URL_TO_SHORTEN = "https://google.com";
+    @Autowired
+    private WordStrategy wordStrategy;
 
-    WordStrategyTest(WordStrategy wordStrategy, Fetcher fetcher, RedisUrlOperations redisUrlOperations) {
-        this.wordStrategy = wordStrategy;
-        this.fetcher = fetcher;
-        this.redisUrlOperations = redisUrlOperations;
-    }
+    @Autowired
+    private Fetcher fetcher;
+
+    @Autowired
+    private RedisUrlOperations redisUrlOperations;
+    public static final String URL_TO_SHORTEN = "https://google.com";
 
     @Test
     @DisplayName("Shortens a URL using Word Strategy")

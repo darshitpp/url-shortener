@@ -1,10 +1,10 @@
 package dev.darshit.urlshortener.strategy;
 
+import dev.darshit.urlshortener.ShortenOptions;
 import dev.darshit.urlshortener.redis.RedisUrlOperations;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 @Service("custom")
 public class CustomStrategy implements UrlShorteningStrategy {
@@ -17,9 +17,9 @@ public class CustomStrategy implements UrlShorteningStrategy {
 
 
     @Override
-    public Optional<String> shorten(String originalUrl, String customPath, int ttlInDays) {
-        Optional<Boolean> valueStored = redisUrlOperations.putIfAbsent(customPath, originalUrl, ttlInDays);
-        String storedUrl = valueStored.isPresent() && valueStored.get() ? customPath : null;
-        return Optional.ofNullable(storedUrl);
+    public Optional<String> shorten(String originalUrl, ShortenOptions options) {
+        Optional<Boolean> valueStored = redisUrlOperations.putIfAbsent(options.getCustomPath(), originalUrl, options.getTtlInDays());
+        String storedPath = valueStored.isPresent() && valueStored.get() ? options.getCustomPath() : null;
+        return Optional.ofNullable(storedPath);
     }
 }

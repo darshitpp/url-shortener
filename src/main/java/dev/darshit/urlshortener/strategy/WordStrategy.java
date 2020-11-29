@@ -1,5 +1,6 @@
 package dev.darshit.urlshortener.strategy;
 
+import dev.darshit.urlshortener.ShortenOptions;
 import dev.darshit.urlshortener.redis.RedisUrlOperations;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -32,12 +33,12 @@ public class WordStrategy implements UrlShorteningStrategy {
 
 
     @Override
-    public Optional<String> shorten(String originalUrl, String customPath, int ttlInDays) {
+    public Optional<String> shorten(String originalUrl, ShortenOptions options) {
         String path;
         Optional<Boolean> valueStored;
         do {
             path = String.join("-", fetchRandomWords());
-            valueStored = redisUrlOperations.putIfAbsent(path, originalUrl, ttlInDays);
+            valueStored = redisUrlOperations.putIfAbsent(path, originalUrl, options.getTtlInDays());
         } while (valueStored.isEmpty() || !valueStored.get());
         return Optional.of(path);
     }

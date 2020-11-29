@@ -14,7 +14,7 @@ import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactor
 @PropertySource("classpath:redis-connection-dev.properties")
 public class LettuceConfiguration {
 
-    @Value("${redis.host")
+    @Value("${redis.host}")
     private String redisHost;
 
     @Value("${redis.port}")

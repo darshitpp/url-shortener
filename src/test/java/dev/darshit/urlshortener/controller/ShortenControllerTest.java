@@ -196,8 +196,8 @@ class ShortenControllerTest {
     }
 
     @Test
-    @DisplayName("Invalid Custom Path")
-    void invalid_custom_path() throws Exception {
+    @DisplayName("Empty Custom Path")
+    void empty_custom_path() throws Exception {
 
         String json = "{\n" +
                 "    \"url\": \"https://google.com\",\n" +
@@ -215,6 +215,30 @@ class ShortenControllerTest {
 
         ShortenResponse response = JsonUtils.value(mvcResult.getResponse().getContentAsString(), ShortenResponse.class);
         Assertions.assertEquals("CustomPath cannot be empty", response.getError());
+        Assertions.assertNull(response.getTtlInDays());
+        Assertions.assertNull(response.getShortUrl());
+    }
+
+    @Test
+    @DisplayName("Invalid Custom Path")
+    void invalid_custom_path() throws Exception {
+
+        String json = "{\n" +
+                "    \"url\": \"https://google.com\",\n" +
+                "    \"options\": {\n" +
+                "        \"customPath\": \"asdfasdf*%\" \n" +
+                "    }\n" +
+                "}";
+
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.request(HttpMethod.POST, "/shorten")
+                .accept(MediaType.APPLICATION_JSON)
+                .content(json)
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andReturn();
+
+        ShortenResponse response = JsonUtils.value(mvcResult.getResponse().getContentAsString(), ShortenResponse.class);
+        Assertions.assertEquals("CustomPath cannot contain special characters except - and _", response.getError());
         Assertions.assertNull(response.getTtlInDays());
         Assertions.assertNull(response.getShortUrl());
     }

@@ -3,6 +3,7 @@ package dev.darshit.urlshortener.domain;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import dev.darshit.urlshortener.utils.StringUtils;
+import dev.darshit.urlshortener.validator.Validator;
 
 import java.util.Objects;
 
@@ -56,6 +57,8 @@ public class ShortenOptions {
         public Builder withCustomPath(String customPath) throws IllegalArgumentException {
             if (StringUtils.isEmpty(customPath)) {
                 throw new IllegalArgumentException("CustomPath cannot be empty");
+            } else if (!Validator.validateCustomPath(customPath)) {
+                throw new IllegalArgumentException("CustomPath cannot contain special characters except - and _");
             }
             this.customPath = customPath;
             return this;

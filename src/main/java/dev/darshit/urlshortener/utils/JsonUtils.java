@@ -118,7 +118,8 @@ public final class JsonUtils {
      * @return converted Map
      */
     public static <T> Map<String, Object> convertToMap(final T value) {
-        TypeReference<Map<String, Object>> typeReference = new TypeReference<Map<String, Object>>() {};
+        TypeReference<Map<String, Object>> typeReference = new TypeReference<>() {
+        };
         return convertValue(value, typeReference);
     }
 
@@ -129,7 +130,8 @@ public final class JsonUtils {
      * @return converted Map
      */
     public static <T, V> Map<String, V> convertToMap(final T value, final Class<V> valueType) {
-        return convertValue(value, new TypeReference<Map<String, V>>() {});
+        return convertValue(value, new TypeReference<>() {
+        });
     }
 
 }

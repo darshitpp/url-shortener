@@ -25,7 +25,10 @@ public class HashStrategy implements ShorteningStrategy {
         Optional<Boolean> valueStored;
         do {
             String numberString = getUniqueNumberString(originalUrl);
-            path = HashUtils.generateHash(numberString, options.isLiberalHash()).substring(0, options.getPathSize());
+            path = HashUtils.generateHash(numberString, options.isLiberalHash());
+            if (path.length() > options.getPathSize()) {
+                path = path.substring(0, options.getPathSize());
+            }
             valueStored = redisUrlOperations.putIfAbsent(path, originalUrl, options.getTtlInDays());
         } while (valueStored.isEmpty() || !valueStored.get());
         return Optional.of(path);

@@ -1,13 +1,22 @@
 package dev.darshit.urlshortener;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import dev.darshit.urlshortener.utils.StringUtils;
 
 import java.util.Objects;
 
 public class ShortenOptions {
+
+    @JsonProperty("customPath")
     private String customPath;
+
+    @JsonProperty("urlSize")
     private int pathSize;
+
+    @JsonProperty("ttl")
     private int ttlInDays;
+
+    @JsonProperty("liberalHash")
     private boolean liberalHash;
 
     public String getCustomPath() {

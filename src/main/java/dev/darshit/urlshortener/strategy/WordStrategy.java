@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Service("words")
-public class WordStrategy implements UrlShorteningStrategy {
+public class WordStrategy implements ShorteningStrategy {
 
     private final List<String> wordSet;
     private final Random random = new Random();

@@ -1,12 +1,15 @@
 package dev.darshit.urlshortener.redis;
 
 import dev.darshit.urlshortener.configuration.RedisSerializationBuilder;
-import dev.darshit.urlshortener.utils.StringUtils;
+import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -38,9 +41,21 @@ public class RedisUrlOperations {
     public Long incrementCounterForShortUrl() {
         Optional<String> counter = get(SHORT_LINK_COUNTER);
         if (counter.isEmpty() || Long.parseLong(counter.get()) == MAX_REDIS_VALUE) {
-            valueOperations.setIfAbsent(SHORT_LINK_COUNTER, String.valueOf(0));
+            resetKey(SHORT_LINK_COUNTER, String.valueOf(0));
         }
         return valueOperations.increment(SHORT_LINK_COUNTER);
+    }
+
+    private Optional<List<Object>> resetKey(final String key, final String value) {
+        List<Object> transaction = redisTemplate.execute(new SessionCallback<>() {
+            public List<Object> execute(RedisOperations operations) throws DataAccessException {
+                operations.watch(key);
+                operations.multi();
+                operations.opsForValue().set(key, value);
+                return operations.exec();
+            }
+        });
+        return Optional.ofNullable(transaction);
     }
 
     public void flushAll() {

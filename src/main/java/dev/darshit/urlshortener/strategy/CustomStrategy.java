@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service("custom")
-public class CustomStrategy implements UrlShorteningStrategy {
+public class CustomStrategy implements ShorteningStrategy {
 
     private final RedisUrlOperations redisUrlOperations;
 

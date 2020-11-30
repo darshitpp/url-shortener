@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service("hash")
-public class HashStrategy implements UrlShorteningStrategy {
+public class HashStrategy implements ShorteningStrategy {
 
     private final RedisUrlOperations redisUrlOperations;
 

@@ -4,7 +4,7 @@ import dev.darshit.urlshortener.ShortenOptions;
 
 import java.util.Optional;
 
-public interface UrlShorteningStrategy {
+public interface ShorteningStrategy {
 
     Optional<String> shorten(String originalUrl, ShortenOptions options);
 

@@ -1,6 +1,6 @@
 package dev.darshit.urlshortener.strategy;
 
-import dev.darshit.urlshortener.ShortenOptions;
+import dev.darshit.urlshortener.domain.ShortenOptions;
 import dev.darshit.urlshortener.fetch.Fetcher;
 import dev.darshit.urlshortener.redis.RedisUrlOperations;
 import org.junit.jupiter.api.AfterEach;
@@ -32,6 +32,7 @@ class HashStrategyTest {
                 .build();
         Optional<String> shorten = hashStrategy.shorten(URL_TO_SHORTEN, option);
         Assertions.assertTrue(shorten.isPresent());
+        Assertions.assertEquals(8, shorten.get().length());
     }
 
     @Test
@@ -42,6 +43,7 @@ class HashStrategyTest {
                 .build();
         Optional<String> shorten = hashStrategy.shorten(URL_TO_SHORTEN, option);
         Assertions.assertTrue(shorten.isPresent());
+        Assertions.assertEquals(8, shorten.get().length());
     }
 
     @Test
@@ -81,6 +83,7 @@ class HashStrategyTest {
                 .build();
         Optional<String> shorten = hashStrategy.shorten(URL_TO_SHORTEN, option);
         Assertions.assertTrue(shorten.isPresent());
+        Assertions.assertEquals(18, shorten.get().length());
     }
 
     @Test
@@ -92,6 +95,7 @@ class HashStrategyTest {
                 .build();
         Optional<String> shorten = hashStrategy.shorten(URL_TO_SHORTEN, option);
         Assertions.assertTrue(shorten.isPresent());
+        Assertions.assertEquals(18, shorten.get().length());
     }
 
     @AfterEach

@@ -1,7 +1,8 @@
 package dev.darshit.urlshortener.controller;
 
-import dev.darshit.urlshortener.ShortenRequest;
-import dev.darshit.urlshortener.ShortenResponse;
+import dev.darshit.urlshortener.domain.ShortenOptions;
+import dev.darshit.urlshortener.domain.ShortenRequest;
+import dev.darshit.urlshortener.domain.ShortenResponse;
 import dev.darshit.urlshortener.strategy.ShorteningStrategy;
 import dev.darshit.urlshortener.strategy.StrategyFactory;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,8 +23,11 @@ public class ShortenController {
     @PostMapping("/shorten")
     public ShortenResponse shortenUrl(@RequestBody ShortenRequest shortenRequest) {
         ShorteningStrategy shorteningStrategy = strategyFactory.get(shortenRequest.getStrategy());
-        Optional<String> shortUrl = shorteningStrategy.shorten(shortenRequest.getUrl(), shortenRequest.getOptions());
+        ShortenOptions options = shortenRequest.getOptions();
+        Optional<String> shortUrl = shorteningStrategy.shorten(shortenRequest.getUrl(), options);
 
-        return new ShortenResponse.Builder().withShortUrl(shortUrl.orElse(null)).build();
+        return new ShortenResponse.Builder()
+                .withShortUrl(shortUrl.orElse(null), options.getTtlInDays())
+                .build();
     }
 }

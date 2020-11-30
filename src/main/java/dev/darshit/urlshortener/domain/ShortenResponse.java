@@ -1,4 +1,4 @@
-package dev.darshit.urlshortener;
+package dev.darshit.urlshortener.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -12,6 +12,8 @@ public class ShortenResponse {
     @JsonProperty("error")
     private String error;
 
+    @JsonProperty("ttl")
+    private Integer ttlInDays;
 
     public String getShortUrl() {
         return shortUrl;
@@ -29,16 +31,18 @@ public class ShortenResponse {
         this.error = error;
     }
 
+    public Integer getTtlInDays() {
+        return ttlInDays;
+    }
+
     public static final class Builder {
         private String shortUrl;
         private String error;
+        private Integer ttlInDays;
 
-        public Builder() {
-        }
-
-
-        public Builder withShortUrl(String shortUrl) {
+        public Builder withShortUrl(String shortUrl, Integer ttlInDays) {
             this.shortUrl = shortUrl;
+            this.ttlInDays = ttlInDays;
             return this;
         }
 
@@ -51,6 +55,7 @@ public class ShortenResponse {
             ShortenResponse shortenResponse = new ShortenResponse();
             shortenResponse.shortUrl = getShortUrl();
             shortenResponse.error = getError();
+            shortenResponse.ttlInDays = getTtlInDays();
             return shortenResponse;
         }
 
@@ -61,6 +66,10 @@ public class ShortenResponse {
         public String getError() {
             return error;
         }
+
+        public Integer getTtlInDays() {
+            return ttlInDays;
+        }
     }
 
     @Override
@@ -69,12 +78,13 @@ public class ShortenResponse {
         if (!(o instanceof ShortenResponse)) return false;
         ShortenResponse that = (ShortenResponse) o;
         return Objects.equals(shortUrl, that.shortUrl) &&
-                Objects.equals(error, that.error);
+                Objects.equals(error, that.error) &&
+                Objects.equals(ttlInDays, that.ttlInDays);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(shortUrl, error);
+        return Objects.hash(shortUrl, error, ttlInDays);
     }
 
     @Override
@@ -82,6 +92,7 @@ public class ShortenResponse {
         return "ShortenResponse{" +
                 "shortUrl='" + shortUrl + '\'' +
                 ", error='" + error + '\'' +
+                ", ttlInDays=" + ttlInDays +
                 '}';
     }
 }

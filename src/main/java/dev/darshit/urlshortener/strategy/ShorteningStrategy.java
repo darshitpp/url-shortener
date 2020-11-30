@@ -1,6 +1,6 @@
 package dev.darshit.urlshortener.strategy;
 
-import dev.darshit.urlshortener.ShortenOptions;
+import dev.darshit.urlshortener.domain.ShortenOptions;
 
 import java.util.Optional;
 

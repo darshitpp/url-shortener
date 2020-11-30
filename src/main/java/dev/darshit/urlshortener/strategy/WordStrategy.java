@@ -1,6 +1,6 @@
 package dev.darshit.urlshortener.strategy;
 
-import dev.darshit.urlshortener.ShortenOptions;
+import dev.darshit.urlshortener.domain.ShortenOptions;
 import dev.darshit.urlshortener.redis.RedisUrlOperations;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

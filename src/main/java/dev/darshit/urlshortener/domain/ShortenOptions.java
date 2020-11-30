@@ -1,22 +1,20 @@
-package dev.darshit.urlshortener;
+package dev.darshit.urlshortener.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import dev.darshit.urlshortener.utils.StringUtils;
 
 import java.util.Objects;
 
+@JsonDeserialize(builder = ShortenOptions.Builder.class)
 public class ShortenOptions {
 
-    @JsonProperty("customPath")
     private String customPath;
 
-    @JsonProperty("urlSize")
     private int pathSize;
 
-    @JsonProperty("ttl")
     private int ttlInDays;
 
-    @JsonProperty("liberalHash")
     private boolean liberalHash;
 
     public String getCustomPath() {
@@ -36,9 +34,17 @@ public class ShortenOptions {
     }
 
     public static final class Builder {
+
+        @JsonProperty("customPath")
         private String customPath;
+
+        @JsonProperty("urlSize")
         private int pathSize;
+
+        @JsonProperty("ttl")
         private int ttlInDays;
+
+        @JsonProperty("liberalHash")
         private boolean liberalHash;
 
         public Builder() {
@@ -57,8 +63,8 @@ public class ShortenOptions {
 
 
         public Builder withPathSize(int pathSize) throws IllegalArgumentException {
-            if (pathSize < 1 || pathSize > 18) {
-                throw new IllegalArgumentException("Size must be between 1 and 18 characters");
+            if (pathSize < 5 || pathSize > 18) {
+                throw new IllegalArgumentException("Size must be between 5 and 18 characters");
             }
             this.pathSize = pathSize;
             return this;

@@ -1,24 +1,25 @@
-package dev.darshit.urlshortener;
+package dev.darshit.urlshortener.domain;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import dev.darshit.urlshortener.validator.Validator;
 
 import java.util.Objects;
 
 public class ShortenRequest {
 
-    @JsonProperty("url")
     private final String url;
-
-    @JsonProperty("strategy")
     private final String strategy;
-
-    @JsonProperty("options")
     private final ShortenOptions options;
 
 
-    public ShortenRequest(String url, String strategy, ShortenOptions options) {
+    @JsonCreator
+    public ShortenRequest(@JsonProperty("url") String url, @JsonProperty("strategy") String strategy, @JsonProperty("options") ShortenOptions options) {
+        if (!Validator.validateUrl(url)) {
+            throw new IllegalArgumentException("Please pass a valid URL");
+        }
         this.url = url;
-        this.options = options;
+        this.options = Objects.requireNonNullElseGet(options, () -> new ShortenOptions.Builder().build());
         this.strategy = strategy;
     }
 

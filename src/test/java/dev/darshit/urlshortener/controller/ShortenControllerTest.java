@@ -6,7 +6,6 @@ import dev.darshit.urlshortener.redis.RedisUrlOperations;
 import dev.darshit.urlshortener.strategy.StrategyFactory;
 import dev.darshit.urlshortener.utils.JsonUtils;
 import dev.darshit.urlshortener.utils.StringUtils;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -53,6 +52,7 @@ class ShortenControllerTest {
         ShortenResponse response = JsonUtils.value(mvcResult.getResponse().getContentAsString(), ShortenResponse.class);
         Assertions.assertFalse(StringUtils.isEmpty(response.getShortUrl()));
         Assertions.assertEquals(7, response.getTtlInDays());
+        redisUrlOperations.delete(response.getShortUrl());
 
     }
 
@@ -75,6 +75,7 @@ class ShortenControllerTest {
         ShortenResponse response = JsonUtils.value(mvcResult.getResponse().getContentAsString(), ShortenResponse.class);
         Assertions.assertEquals(7, response.getTtlInDays());
         Assertions.assertEquals(8, response.getShortUrl().length());
+        redisUrlOperations.delete(response.getShortUrl());
     }
 
     @Test
@@ -268,11 +269,30 @@ class ShortenControllerTest {
         Assertions.assertFalse(StringUtils.isEmpty(response.getShortUrl()));
         Assertions.assertTrue(response.getShortUrl().startsWith("http://abc.com/"));
         Assertions.assertEquals(7, response.getTtlInDays());
+        redisUrlOperations.delete(response.getShortUrl().substring(response.getShortUrl().lastIndexOf("/")));
     }
 
-    @AfterEach
-    void flushRedis() {
-        redisUrlOperations.flushAll();
-    }
+    @Test
+    @DisplayName("Shorten URL with invalid Domain in request")
+    void shorten_url_with_invalid_domain_in_request() throws Exception {
 
+        String json = "{\n" +
+                "    \"url\": \"https://google.com\",\n" +
+                "    \"options\": {\n" +
+                "        \"domain\": \"abc.com\"\n" +
+                "    }\n" +
+                "}";
+
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.request(HttpMethod.POST, "/shorten")
+                .accept(MediaType.APPLICATION_JSON)
+                .content(json)
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andReturn();
+
+        ShortenResponse response = JsonUtils.value(mvcResult.getResponse().getContentAsString(), ShortenResponse.class);
+        Assertions.assertEquals("Please pass a valid domain starting with http/https", response.getError());
+        Assertions.assertNull(response.getTtlInDays());
+        Assertions.assertNull(response.getShortUrl());
+    }
 }

@@ -4,7 +4,6 @@ import dev.darshit.urlshortener.configuration.LettuceTestConfiguration;
 import dev.darshit.urlshortener.domain.ShortenOptions;
 import dev.darshit.urlshortener.fetch.Fetcher;
 import dev.darshit.urlshortener.redis.RedisUrlOperations;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -40,6 +39,7 @@ class CustomStrategyTest {
 
         Optional<String> shorten = customStrategy.shorten(URL_TO_SHORTEN, options);
         Assertions.assertTrue(shorten.isPresent());
+        redisUrlOperations.delete(CUSTOM_PATH);
     }
 
 
@@ -56,10 +56,6 @@ class CustomStrategyTest {
 
         Assertions.assertTrue(originalUrl.isPresent());
         Assertions.assertEquals(URL_TO_SHORTEN, originalUrl.get());
-    }
-
-    @AfterEach
-    public void cleanUp() {
-        redisUrlOperations.flushAll();
+        redisUrlOperations.delete(CUSTOM_PATH);
     }
 }

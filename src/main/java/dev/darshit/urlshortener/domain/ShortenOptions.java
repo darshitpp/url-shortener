@@ -96,6 +96,9 @@ public class ShortenOptions {
         }
 
         public Builder withDomain(String domain) {
+            if (!Validator.validateUrl(domain)) {
+                throw new IllegalArgumentException("Please pass a valid domain starting with http/https");
+            }
             this.domain = domain;
             return this;
         }

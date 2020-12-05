@@ -62,4 +62,8 @@ public class RedisUrlOperations {
         Objects.requireNonNull(redisTemplate.getConnectionFactory())
                 .getConnection().flushAll();
     }
+
+    public void delete(String key) {
+        redisTemplate.delete(key);
+    }
 }

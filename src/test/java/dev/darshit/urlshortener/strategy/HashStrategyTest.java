@@ -4,7 +4,6 @@ import dev.darshit.urlshortener.configuration.LettuceTestConfiguration;
 import dev.darshit.urlshortener.domain.ShortenOptions;
 import dev.darshit.urlshortener.fetch.Fetcher;
 import dev.darshit.urlshortener.redis.RedisUrlOperations;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,6 +35,7 @@ class HashStrategyTest {
         Optional<String> shorten = hashStrategy.shorten(URL_TO_SHORTEN, option);
         Assertions.assertTrue(shorten.isPresent());
         Assertions.assertEquals(8, shorten.get().length());
+        redisUrlOperations.delete(shorten.get());
     }
 
     @Test
@@ -47,6 +47,7 @@ class HashStrategyTest {
         Optional<String> shorten = hashStrategy.shorten(URL_TO_SHORTEN, option);
         Assertions.assertTrue(shorten.isPresent());
         Assertions.assertEquals(8, shorten.get().length());
+        redisUrlOperations.delete(shorten.get());
     }
 
     @Test
@@ -61,6 +62,7 @@ class HashStrategyTest {
 
         Assertions.assertTrue(originalUrl.isPresent());
         Assertions.assertEquals(URL_TO_SHORTEN, originalUrl.get());
+        redisUrlOperations.delete(shorten.get());
     }
 
     @Test
@@ -76,6 +78,7 @@ class HashStrategyTest {
 
         Assertions.assertTrue(originalUrl.isPresent());
         Assertions.assertEquals(URL_TO_SHORTEN, originalUrl.get());
+        redisUrlOperations.delete(shorten.get());
     }
 
     @Test
@@ -87,6 +90,7 @@ class HashStrategyTest {
         Optional<String> shorten = hashStrategy.shorten(URL_TO_SHORTEN, option);
         Assertions.assertTrue(shorten.isPresent());
         Assertions.assertEquals(18, shorten.get().length());
+        redisUrlOperations.delete(shorten.get());
     }
 
     @Test
@@ -98,11 +102,7 @@ class HashStrategyTest {
                 .build();
         Optional<String> shorten = hashStrategy.shorten(URL_TO_SHORTEN, option);
         Assertions.assertTrue(shorten.isPresent());
-        Assertions.assertEquals(18, shorten.get().length());
-    }
-
-    @AfterEach
-    public void cleanUp() {
-        redisUrlOperations.flushAll();
+        Assertions.assertTrue(shorten.get().length() <= 18);
+        redisUrlOperations.delete(shorten.get());
     }
 }

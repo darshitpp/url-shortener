@@ -18,6 +18,8 @@ public class ShortenOptions {
 
     private boolean liberalHash;
 
+    private String domain;
+
     public String getCustomPath() {
         return customPath;
     }
@@ -34,6 +36,10 @@ public class ShortenOptions {
         return liberalHash;
     }
 
+    public String getDomain() {
+        return domain;
+    }
+
     public static final class Builder {
 
         @JsonProperty("customPath")
@@ -47,6 +53,9 @@ public class ShortenOptions {
 
         @JsonProperty("liberalHash")
         private boolean liberalHash;
+
+        @JsonProperty("domain")
+        private String domain;
 
         public Builder() {
             this.pathSize = 8;
@@ -86,12 +95,18 @@ public class ShortenOptions {
             return this;
         }
 
+        public Builder withDomain(String domain) {
+            this.domain = domain;
+            return this;
+        }
+
         public ShortenOptions build() {
             ShortenOptions shortenOptions = new ShortenOptions();
             shortenOptions.customPath = getCustomPath();
             shortenOptions.pathSize = getPathSize();
             shortenOptions.ttlInDays = getTtlInDays();
             shortenOptions.liberalHash = isLiberalHash();
+            shortenOptions.domain = getDomain();
             return shortenOptions;
         }
 
@@ -110,22 +125,23 @@ public class ShortenOptions {
         public boolean isLiberalHash() {
             return liberalHash;
         }
+
+        public String getDomain() {
+            return domain;
+        }
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof ShortenOptions)) return false;
-        ShortenOptions options = (ShortenOptions) o;
-        return pathSize == options.pathSize &&
-                ttlInDays == options.ttlInDays &&
-                liberalHash == options.liberalHash &&
-                Objects.equals(customPath, options.customPath);
+        ShortenOptions that = (ShortenOptions) o;
+        return pathSize == that.pathSize && ttlInDays == that.ttlInDays && liberalHash == that.liberalHash && Objects.equals(customPath, that.customPath) && Objects.equals(domain, that.domain);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(customPath, pathSize, ttlInDays, liberalHash);
+        return Objects.hash(customPath, pathSize, ttlInDays, liberalHash, domain);
     }
 
     @Override
@@ -135,6 +151,7 @@ public class ShortenOptions {
                 ", pathSize=" + pathSize +
                 ", ttlInDays=" + ttlInDays +
                 ", liberalHash=" + liberalHash +
+                ", domain='" + domain + '\'' +
                 '}';
     }
 }

@@ -1,6 +1,7 @@
 package dev.darshit.urlshortener.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import dev.darshit.urlshortener.utils.StringUtils;
 
 import java.util.Objects;
 
@@ -39,10 +40,16 @@ public class ShortenResponse {
         private String shortUrl;
         private String error;
         private Integer ttlInDays;
+        private String domain;
 
         public Builder withShortUrl(String shortUrl, Integer ttlInDays) {
             this.shortUrl = shortUrl;
             this.ttlInDays = ttlInDays;
+            return this;
+        }
+
+        public Builder withDomain(String domain) {
+            this.domain = domain;
             return this;
         }
 
@@ -53,10 +60,23 @@ public class ShortenResponse {
 
         public ShortenResponse build() {
             ShortenResponse shortenResponse = new ShortenResponse();
-            shortenResponse.shortUrl = getShortUrl();
+            shortenResponse.shortUrl = buildShortUrl();
             shortenResponse.error = getError();
             shortenResponse.ttlInDays = getTtlInDays();
             return shortenResponse;
+        }
+
+        public String buildShortUrl() {
+            String domain = getDomain();
+            String url = getShortUrl();
+            if (!StringUtils.isEmpty(domain)) {
+                if (domain.endsWith("/")) {
+                    url = domain + getShortUrl();
+                } else {
+                    url = domain + "/" + getShortUrl();
+                }
+            }
+            return url;
         }
 
         public String getShortUrl() {
@@ -69,6 +89,10 @@ public class ShortenResponse {
 
         public Integer getTtlInDays() {
             return ttlInDays;
+        }
+
+        public String getDomain() {
+            return domain;
         }
     }
 

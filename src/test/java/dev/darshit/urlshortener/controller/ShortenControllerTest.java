@@ -246,6 +246,30 @@ class ShortenControllerTest {
         Assertions.assertNull(response.getShortUrl());
     }
 
+    @Test
+    @DisplayName("Shorten URL with Domain in request")
+    void shorten_url_with_domain_in_request() throws Exception {
+
+        String json = "{\n" +
+                "    \"url\": \"https://google.com\",\n" +
+                "    \"options\": {\n" +
+                "        \"domain\": \"http://abc.com\"\n" +
+                "    }\n" +
+                "}";
+
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.request(HttpMethod.POST, "/shorten")
+                .accept(MediaType.APPLICATION_JSON)
+                .content(json)
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
+
+        ShortenResponse response = JsonUtils.value(mvcResult.getResponse().getContentAsString(), ShortenResponse.class);
+        Assertions.assertFalse(StringUtils.isEmpty(response.getShortUrl()));
+        Assertions.assertTrue(response.getShortUrl().startsWith("http://abc.com/"));
+        Assertions.assertEquals(7, response.getTtlInDays());
+    }
+
     @AfterEach
     void flushRedis() {
         redisUrlOperations.flushAll();

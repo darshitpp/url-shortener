@@ -1,5 +1,6 @@
 package dev.darshit.urlshortener.strategy;
 
+import dev.darshit.urlshortener.configuration.LettuceTestConfiguration;
 import dev.darshit.urlshortener.domain.ShortenOptions;
 import dev.darshit.urlshortener.fetch.Fetcher;
 import dev.darshit.urlshortener.redis.RedisUrlOperations;
@@ -9,10 +10,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 
 import java.util.Optional;
 
 @SpringBootTest
+@Import(LettuceTestConfiguration.class)
 class CustomStrategyTest {
 
     @Autowired

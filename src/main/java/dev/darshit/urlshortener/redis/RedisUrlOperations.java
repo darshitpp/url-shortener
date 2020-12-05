@@ -23,8 +23,8 @@ public class RedisUrlOperations {
     private static final long MAX_REDIS_VALUE = 9223372036854775807L;
     private static final String SHORT_LINK_COUNTER = "SHORT_LINK_COUNTER";
 
-    public RedisUrlOperations(LettuceConnectionFactory redisConnectionFactory) {
-        this.redisTemplate = RedisSerializationBuilder.getRedisTemplate(redisConnectionFactory, String.class);
+    public RedisUrlOperations(LettuceConnectionFactory lettuceConnectionFactory) {
+        this.redisTemplate = RedisSerializationBuilder.getRedisTemplate(lettuceConnectionFactory, String.class);
         this.valueOperations = redisTemplate.opsForValue();
     }
 

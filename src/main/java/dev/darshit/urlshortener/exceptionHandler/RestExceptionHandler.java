@@ -20,7 +20,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<ShortenResponse> handleIllegalArgumentException(
             IllegalArgumentException ex) {
         ShortenResponse shortenResponse = new ShortenResponse.Builder()
-                .withError(ex.getCause().getMessage())
+                .withError(ex.getMessage())
                 .build();
         return new ResponseEntity<>(shortenResponse, HttpStatus.BAD_REQUEST);
     }

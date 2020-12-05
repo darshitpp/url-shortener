@@ -3,13 +3,12 @@ package dev.darshit.urlshortener.controller;
 import dev.darshit.urlshortener.domain.ShortenOptions;
 import dev.darshit.urlshortener.domain.ShortenRequest;
 import dev.darshit.urlshortener.domain.ShortenResponse;
+import dev.darshit.urlshortener.redis.RedisUrlOperations;
 import dev.darshit.urlshortener.strategy.ShorteningStrategy;
 import dev.darshit.urlshortener.strategy.StrategyFactory;
 import dev.darshit.urlshortener.utils.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import dev.darshit.urlshortener.validator.Validator;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
@@ -17,12 +16,11 @@ import java.util.Optional;
 public class ShortenController {
 
     private final StrategyFactory strategyFactory;
+    private final RedisUrlOperations redisUrlOperations;
 
-    @Value("${default.domain:@null}")
-    private String defaultDomain;
-
-    public ShortenController(StrategyFactory strategyFactory) {
+    public ShortenController(StrategyFactory strategyFactory, RedisUrlOperations redisUrlOperations) {
         this.strategyFactory = strategyFactory;
+        this.redisUrlOperations = redisUrlOperations;
     }
 
     @PostMapping("/shorten")
@@ -31,10 +29,29 @@ public class ShortenController {
         ShortenOptions options = shortenRequest.getOptions();
         Optional<String> shortUrl = shorteningStrategy.shorten(shortenRequest.getUrl(), options);
 
-        String domain = StringUtils.isEmpty(options.getDomain()) ? defaultDomain : options.getDomain();
+        String domain = options.getDomain();
+        Optional<String> defaultDomain = redisUrlOperations.getDefaultDomain();
+        if (StringUtils.isEmpty(options.getDomain()) && defaultDomain.isPresent()) {
+            domain = defaultDomain.get();
+        }
+
         return new ShortenResponse.Builder()
                 .withDomain(domain)
                 .withShortUrl(shortUrl.orElse(null), options.getTtlInDays())
                 .build();
+    }
+
+    @PutMapping("/update/defaultDomain")
+    public void updateDefaultDomain(@RequestParam("value") String defaultDomain) {
+        if (!Validator.validateUrl(defaultDomain)) {
+            throw new IllegalArgumentException("Please pass a valid domain starting with http/https");
+        } else {
+            redisUrlOperations.putDefaultDomain(defaultDomain);
+        }
+    }
+
+    @PutMapping("/delete/defaultDomain")
+    public void deleteDefaultDomain() {
+        redisUrlOperations.deleteDefaultDomain();
     }
 }

@@ -22,6 +22,7 @@ public class RedisUrlOperations {
 
     private static final long MAX_REDIS_VALUE = 9223372036854775807L;
     private static final String SHORT_LINK_COUNTER = "SHORT_LINK_COUNTER";
+    private static final String DEFAULT_DOMAIN = "DEFAULT_DOMAIN";
 
     public RedisUrlOperations(LettuceConnectionFactory lettuceConnectionFactory) {
         this.redisTemplate = RedisSerializationBuilder.getRedisTemplate(lettuceConnectionFactory, String.class);
@@ -65,5 +66,17 @@ public class RedisUrlOperations {
 
     public void delete(String key) {
         redisTemplate.delete(key);
+    }
+
+    public void putDefaultDomain(String defaultDomain) {
+        valueOperations.set(DEFAULT_DOMAIN, defaultDomain);
+    }
+
+    public void deleteDefaultDomain() {
+        delete(DEFAULT_DOMAIN);
+    }
+
+    public Optional<String> getDefaultDomain() {
+        return Optional.ofNullable(valueOperations.get(DEFAULT_DOMAIN));
     }
 }

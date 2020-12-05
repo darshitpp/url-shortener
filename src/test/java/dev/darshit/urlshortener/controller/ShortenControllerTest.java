@@ -295,4 +295,36 @@ class ShortenControllerTest {
         Assertions.assertNull(response.getTtlInDays());
         Assertions.assertNull(response.getShortUrl());
     }
+
+    @Test
+    @DisplayName("Update Default domain")
+    void update_default_domain() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.request(HttpMethod.PUT, "/update/defaultDomain")
+                .param("value", "http://abc.com")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
+
+        Assertions.assertTrue(redisUrlOperations.getDefaultDomain().isPresent());
+        Assertions.assertEquals("http://abc.com", redisUrlOperations.getDefaultDomain().get());
+        redisUrlOperations.deleteDefaultDomain();
+    }
+
+    @Test
+    @DisplayName("Update with Default Invalid domain")
+    void update_with_default_invalid_domain() throws Exception {
+
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.request(HttpMethod.PUT, "/update/defaultDomain")
+                .param("value", "abc.com")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andReturn();
+
+        ShortenResponse response = JsonUtils.value(mvcResult.getResponse().getContentAsString(), ShortenResponse.class);
+        Assertions.assertEquals("Please pass a valid domain starting with http/https", response.getError());
+        Assertions.assertNull(response.getTtlInDays());
+        Assertions.assertNull(response.getShortUrl());
+    }
 }

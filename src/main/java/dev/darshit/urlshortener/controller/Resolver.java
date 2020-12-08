@@ -1,6 +1,8 @@
 package dev.darshit.urlshortener.controller;
 
 import dev.darshit.urlshortener.fetch.Fetcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +14,8 @@ import java.util.Optional;
 
 @Controller
 public class Resolver {
+
+    private static final Logger logger = LoggerFactory.getLogger(Resolver.class);
 
     private final Fetcher fetcher;
 

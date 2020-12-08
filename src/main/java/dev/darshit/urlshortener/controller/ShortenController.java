@@ -8,12 +8,16 @@ import dev.darshit.urlshortener.strategy.ShorteningStrategy;
 import dev.darshit.urlshortener.strategy.StrategyFactory;
 import dev.darshit.urlshortener.utils.StringUtils;
 import dev.darshit.urlshortener.validator.Validator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
 @RestController
 public class ShortenController {
+
+    private static final Logger logger = LoggerFactory.getLogger(ShortenController.class);
 
     private final StrategyFactory strategyFactory;
     private final RedisUrlOperations redisUrlOperations;

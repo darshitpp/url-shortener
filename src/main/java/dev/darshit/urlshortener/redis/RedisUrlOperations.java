@@ -1,6 +1,9 @@
 package dev.darshit.urlshortener.redis;
 
 import dev.darshit.urlshortener.configuration.RedisSerializationBuilder;
+import dev.darshit.urlshortener.controller.ShortenController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisOperations;
@@ -16,6 +19,8 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 public class RedisUrlOperations {
+
+    private static final Logger logger = LoggerFactory.getLogger(RedisUrlOperations.class);
 
     private final RedisTemplate<String, String> redisTemplate;
     private final ValueOperations<String, String> valueOperations;

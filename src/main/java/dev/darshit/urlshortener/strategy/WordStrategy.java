@@ -37,13 +37,13 @@ public class WordStrategy implements ShorteningStrategy {
         String path;
         Optional<Boolean> valueStored;
         do {
-            path = String.join("-", fetchRandomWords());
+            path = String.join("-", fetchRandomWords(numberOfWords));
             valueStored = redisUrlOperations.putIfAbsent(path, originalUrl, options.getTtlInDays());
         } while (valueStored.isEmpty() || !valueStored.get());
         return Optional.of(path);
     }
 
-    private List<String> fetchRandomWords() {
+    public List<String> fetchRandomWords(int numberOfWords) {
         return IntStream.range(0, numberOfWords)
                 .map(i -> random.nextInt(wordSet.size()))
                 .mapToObj(wordSet::get)

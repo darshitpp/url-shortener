@@ -24,14 +24,18 @@ public class HashStrategy implements ShorteningStrategy {
         String path;
         Optional<Boolean> valueStored;
         do {
-            String numberString = getUniqueNumberString(originalUrl);
-            path = HashUtils.generateHash(numberString, options.isLiberalHash());
+            path = getHashedValue(originalUrl, options.isLiberalHash());
             if (path.length() > options.getPathSize()) {
                 path = path.substring(0, options.getPathSize());
             }
             valueStored = redisUrlOperations.putIfAbsent(path, originalUrl, options.getTtlInDays());
         } while (valueStored.isEmpty() || !valueStored.get());
         return Optional.of(path);
+    }
+
+    public String getHashedValue(String originalUrl, boolean liberalHash) {
+        String numberString = getUniqueNumberString(originalUrl);
+        return HashUtils.generateHash(numberString, liberalHash);
     }
 
     private String getUniqueNumberString(String originalUrl) {

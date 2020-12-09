@@ -15,6 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -298,6 +299,7 @@ class ShortenControllerTest {
 
     @Test
     @DisplayName("Update Default domain")
+    @WithMockUser(username = "${USER_NAME:admin}", password = "${PASSWORD:admin}")
     void update_default_domain() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.request(HttpMethod.PUT, "/update/defaultDomain")
                 .param("value", "http://abc.com")
@@ -313,6 +315,7 @@ class ShortenControllerTest {
 
     @Test
     @DisplayName("Update with Default Invalid domain")
+    @WithMockUser(username = "${USER_NAME:admin}", password = "${PASSWORD:admin}")
     void update_with_default_invalid_domain() throws Exception {
 
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.request(HttpMethod.PUT, "/update/defaultDomain")

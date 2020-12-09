@@ -6,6 +6,7 @@ import dev.darshit.urlshortener.domain.ShortenResponse;
 import dev.darshit.urlshortener.redis.RedisUrlOperations;
 import dev.darshit.urlshortener.strategy.ShorteningStrategy;
 import dev.darshit.urlshortener.strategy.StrategyFactory;
+import dev.darshit.urlshortener.utils.JsonUtils;
 import dev.darshit.urlshortener.utils.StringUtils;
 import dev.darshit.urlshortener.validator.Validator;
 import org.slf4j.Logger;
@@ -29,6 +30,7 @@ public class ShortenController {
 
     @PostMapping("/shorten")
     public ShortenResponse shortenUrl(@RequestBody ShortenRequest shortenRequest) {
+        logger.debug("Received request: {}", JsonUtils.json(shortenRequest));
         ShorteningStrategy shorteningStrategy = strategyFactory.get(shortenRequest.getStrategy());
         ShortenOptions options = shortenRequest.getOptions();
         Optional<String> shortUrl = shorteningStrategy.shorten(shortenRequest.getUrl(), options);

@@ -22,6 +22,17 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Value("${PASSWORD:admin}")
     private String password;
 
+    private static final String[] WHITELIST = {
+            // Exposed APIs
+            "/shorten",
+            "/{shortPath}",
+            // Swagger Endpoints
+            "/v2/api-docs",
+            "/swagger-resources",
+            "/swagger-resources/**",
+            "/swagger-ui/**"
+    };
+
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
         auth.inMemoryAuthentication()
@@ -33,7 +44,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/shorten", "/{shortPath}").permitAll()
+                .antMatchers(WHITELIST).permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .httpBasic();

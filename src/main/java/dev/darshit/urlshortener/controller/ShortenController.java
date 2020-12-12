@@ -9,6 +9,7 @@ import dev.darshit.urlshortener.strategy.StrategyFactory;
 import dev.darshit.urlshortener.utils.JsonUtils;
 import dev.darshit.urlshortener.utils.StringUtils;
 import dev.darshit.urlshortener.validator.Validator;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +29,7 @@ public class ShortenController {
         this.redisUrlOperations = redisUrlOperations;
     }
 
+    @ApiOperation(value = "Shorten a URL", response = ShortenResponse.class)
     @PostMapping("/shorten")
     public ShortenResponse shortenUrl(@RequestBody ShortenRequest shortenRequest) {
         logger.debug("Received request: {}", JsonUtils.json(shortenRequest));
@@ -47,6 +49,7 @@ public class ShortenController {
                 .build();
     }
 
+    @ApiOperation(value = "Update the Default Domain")
     @PutMapping("/update/defaultDomain")
     public void updateDefaultDomain(@RequestParam("value") String defaultDomain) {
         if (!Validator.validateUrl(defaultDomain)) {
@@ -56,6 +59,7 @@ public class ShortenController {
         }
     }
 
+    @ApiOperation(value = "Remove the Default Domain")
     @PutMapping("/delete/defaultDomain")
     public void deleteDefaultDomain() {
         redisUrlOperations.deleteDefaultDomain();

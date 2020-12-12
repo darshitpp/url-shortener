@@ -17,7 +17,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 @SpringBootTest
 @AutoConfigureMockMvc
 @Import(LettuceTestConfiguration.class)
-class ResolverTest {
+class ResolveControllerTest {
 
     @Autowired
     private MockMvc mockMvc;

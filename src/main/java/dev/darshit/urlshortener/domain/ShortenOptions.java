@@ -4,20 +4,26 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import dev.darshit.urlshortener.utils.StringUtils;
 import dev.darshit.urlshortener.validator.Validator;
+import io.swagger.annotations.ApiModelProperty;
 
 import java.util.Objects;
 
 @JsonDeserialize(builder = ShortenOptions.Builder.class)
 public class ShortenOptions {
 
+    @ApiModelProperty(notes = "Custom URL path to shorten with. Only used with Custom strategy")
     private String customPath;
 
+    @ApiModelProperty(notes = "Size of the URL path. Only used with Hash strategy")
     private int pathSize;
 
+    @ApiModelProperty(notes = "TTL of the Short URL")
     private int ttlInDays;
 
+    @ApiModelProperty(notes = "Use Liberal hash generation. Only used with Hash strategy")
     private boolean liberalHash;
 
+    @ApiModelProperty(notes = "Domain of the short URL")
     private String domain;
 
     public String getCustomPath() {

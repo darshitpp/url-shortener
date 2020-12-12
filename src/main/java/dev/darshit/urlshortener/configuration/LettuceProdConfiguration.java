@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.connection.ReactiveRedisConnection;
 import org.springframework.data.redis.connection.ReactiveRedisConnectionFactory;
-import org.springframework.data.redis.connection.RedisConfiguration;
+import org.springframework.data.redis.connection.RedisPassword;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 
@@ -20,9 +20,13 @@ public class LettuceProdConfiguration {
     @Value("${REDIS_PORT}")
     private int redisPort;
 
+    @Value("${REDIS_PASS}")
+    private String redisPass;
+
     @Bean
     public LettuceConnectionFactory lettuceConnectionFactory() {
-        RedisConfiguration configuration = new RedisStandaloneConfiguration(redisHost, redisPort);
+        RedisStandaloneConfiguration configuration = new RedisStandaloneConfiguration(redisHost, redisPort);
+        configuration.setPassword(RedisPassword.of(redisPass));
         return new LettuceConnectionFactory(configuration);
     }
 

@@ -1,6 +1,6 @@
 package dev.darshit.urlshortener;
 
-import dev.darshit.urlshortener.controller.Resolver;
+import dev.darshit.urlshortener.controller.ResolveController;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 public class SmokeTest {
 
     @Autowired
-    private Resolver controller;
+    private ResolveController controller;
 
     @Test
     public void contextLoads() throws Exception {

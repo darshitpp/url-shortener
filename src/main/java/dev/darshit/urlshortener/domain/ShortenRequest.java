@@ -3,13 +3,19 @@ package dev.darshit.urlshortener.domain;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import dev.darshit.urlshortener.validator.Validator;
+import io.swagger.annotations.ApiModelProperty;
 
 import java.util.Objects;
 
 public class ShortenRequest {
 
+    @ApiModelProperty(notes = "The URL to be shortened", required = true)
     private final String url;
+
+    @ApiModelProperty(notes = "URL shortening strategy", allowableValues = "custom, hash, word, wordHash")
     private final String strategy;
+
+    @ApiModelProperty(notes = "URL shortening options")
     private final ShortenOptions options;
 
 

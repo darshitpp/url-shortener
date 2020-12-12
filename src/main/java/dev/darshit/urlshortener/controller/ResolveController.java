@@ -13,13 +13,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import java.util.Optional;
 
 @Controller
-public class Resolver {
+public class ResolveController {
 
-    private static final Logger logger = LoggerFactory.getLogger(Resolver.class);
+    private static final Logger logger = LoggerFactory.getLogger(ResolveController.class);
 
     private final Fetcher fetcher;
 
-    public Resolver(Fetcher fetcher) {
+    public ResolveController(Fetcher fetcher) {
         this.fetcher = fetcher;
     }
 

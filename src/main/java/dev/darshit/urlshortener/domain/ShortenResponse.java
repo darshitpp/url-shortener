@@ -2,17 +2,21 @@ package dev.darshit.urlshortener.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import dev.darshit.urlshortener.utils.StringUtils;
+import io.swagger.annotations.ApiModelProperty;
 
 import java.util.Objects;
 
 public class ShortenResponse {
 
+    @ApiModelProperty(notes = "The Shortened URL")
     @JsonProperty("shortUrl")
     private String shortUrl;
 
+    @ApiModelProperty(notes = "Error Message")
     @JsonProperty("error")
     private String error;
 
+    @ApiModelProperty(notes = "TTL of the URL")
     @JsonProperty("ttl")
     private Integer ttlInDays;
 

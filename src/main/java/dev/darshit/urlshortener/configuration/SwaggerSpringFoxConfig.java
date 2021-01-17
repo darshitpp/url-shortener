@@ -31,6 +31,6 @@ public class SwaggerSpringFoxConfig {
                 "API TOS",
                 "Terms of service",
                 new Contact("Darshit Patel", "https://darshit.dev", "darshit12@gmail.com"),
-                "TBD", "https://choosealicense.com/", Collections.emptyList());
+                "Apache License 2.0", "https://www.apache.org/licenses/LICENSE-2.0.txt", Collections.emptyList());
     }
 }

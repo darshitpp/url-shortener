@@ -10,7 +10,7 @@
     </parent>
     <groupId>dev.darshit</groupId>
     <artifactId>url-shortener</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1</version>
     <name>url-shortener</name>
     <description>Service to Shorten and Resolve URLs</description>
     <properties>

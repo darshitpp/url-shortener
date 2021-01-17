@@ -2,11 +2,9 @@
 
 ## A self-hosted URL Shortener
 
-
-
 Swagger API playground: https://just.darshit.dev/swagger-ui/index.html
 
-Try it out at https://just.darshit.dev (ironically, I did not buy a new short domain)
+Try it out at https://just.darshit.dev with Postman (ironically, I did not buy a new short domain)
 ### REST API
 
 (Optional) 

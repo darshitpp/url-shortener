@@ -2,7 +2,7 @@
 
 ## A self-hosted URL Shortener
 
-------
+
 
 Swagger API playground: https://just.darshit.dev/swagger-ui/index.html
 

@@ -86,7 +86,7 @@ Response:
 
 Removes the default domain
 
-Note: requires basic authentication based on the `USER_NAME` and `USER_PASS`. See [Environment Variables](#environment-variables)
+Note: requires basic authentication based on the `USER_NAME` and `PASSWORD`. See [Environment Variables](#environment-variables)
 
 ------
 
@@ -104,7 +104,7 @@ REDIS_HOST=localhost // Redis Host Name
 REDIS_PORT=6379      // Redis Port
 REDIS_PASS=admin     // Redis Password
 USER_NAME=admin      // UserName for access to protected features
-USER_PASS=admin      // Password for access to protected features
+PASSWORD=admin      // Password for access to protected features
 ```
 
 ### Run as JAR

@@ -10,11 +10,11 @@ public final class StringUtils {
         return (value == null || "".equals(value) || "null".equalsIgnoreCase(value));
     }
 
-    public static List<String> split(String value, String delimeter) {
-        if (isEmpty(value) || isEmpty(delimeter)) {
+    public static List<String> split(String value, String delimiter) {
+        if (isEmpty(value) || isEmpty(delimiter)) {
             return new ArrayList<>();
         }
-        return Arrays.asList(value.split(delimeter));
+        return Arrays.asList(value.split(delimiter));
     }
 
     public static String replace(final String value, final String target, final String replacement) {

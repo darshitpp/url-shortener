@@ -10,6 +10,11 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 
 @Configuration
@@ -21,6 +26,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Value("${PASSWORD:admin}")
     private String password;
+
+    @Value("${CORS_ENABLED:*}")
+    private String[] corsEnabled;
 
     private static final String[] WHITELIST = {
             // Exposed APIs
@@ -42,7 +50,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
 
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable()
+        http
+                .cors().configurationSource(corsConfigurationSource())
+                .and()
+                .csrf().disable()
                 .authorizeRequests()
                 .antMatchers(WHITELIST).permitAll()
                 .anyRequest().authenticated()
@@ -53,5 +64,15 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of(corsEnabled));
+        configuration.setAllowedMethods(List.of("POST"));
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/shorten", configuration);
+        return source;
     }
 }

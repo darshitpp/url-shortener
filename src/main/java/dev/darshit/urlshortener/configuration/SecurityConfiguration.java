@@ -8,6 +8,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.cors.CorsConfiguration;
@@ -21,20 +22,42 @@ import java.util.List;
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-    @Value("${USER_NAME:admin}")
-    private String userName;
+    private final String userName;
+    private final String password;
+    private final String[] corsEnabled;
 
-    @Value("${PASSWORD:admin}")
-    private String password;
+    public SecurityConfiguration(
+            @Value("${USER_NAME}") String userName,
+            @Value("${PASSWORD}") String password,
+            @Value("${CORS_ENABLED}") String[] corsEnabled) {
+        this.userName = requireValue("USER_NAME", userName);
+        this.password = requireValue("PASSWORD", password);
+        if (corsEnabled == null || corsEnabled.length == 0) {
+            throw new IllegalStateException("CORS_ENABLED must contain at least one origin");
+        }
+        String[] normalizedOrigins = new String[corsEnabled.length];
+        for (int index = 0; index < corsEnabled.length; index++) {
+            String value = requireValue("CORS_ENABLED", corsEnabled[index]).trim();
+            if ("*".equals(value)) {
+                throw new IllegalStateException("Wildcard CORS origins are not allowed");
+            }
+            normalizedOrigins[index] = value;
+        }
+        this.corsEnabled = normalizedOrigins;
+    }
 
-    @Value("${CORS_ENABLED:*}")
-    private String[] corsEnabled;
+    private static String requireValue(String name, String value) {
+        if (value == null || value.isBlank()) {
+            throw new IllegalStateException(name + " must not be blank");
+        }
+        return value;
+    }
 
     private static final String[] WHITELIST = {
-            // Exposed APIs
             "/shorten",
+            "/resolve/{shortPath}",
+            "/ui/**",
             "/{shortPath}",
-            // Swagger Endpoints
             "/v2/api-docs",
             "/swagger-resources",
             "/swagger-resources/**",
@@ -58,6 +81,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers(WHITELIST).permitAll()
                 .anyRequest().authenticated()
                 .and()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
                 .httpBasic();
     }
 
@@ -70,7 +96,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of(corsEnabled));
-        configuration.setAllowedMethods(List.of("POST"));
+        configuration.setAllowedMethods(List.of("POST", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("Content-Type"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/shorten", configuration);
         return source;

@@ -98,14 +98,32 @@ Note: requires basic authentication based on the `USER_NAME` and `PASSWORD`. See
 
 
 #### Environment Variables:
-Ensure that Redis Environment variables are set up on your system:
+Required environment variables (no defaults; the service fails to start if any are blank):
 ```
 REDIS_HOST=localhost // Redis Host Name
 REDIS_PORT=6379      // Redis Port
-REDIS_PASS=admin     // Redis Password
-USER_NAME=admin      // UserName for access to protected features
-PASSWORD=admin      // Password for access to protected features
+REDIS_PASS=admin     // Redis Password (Redis AUTH)
+USER_NAME=...        // Required. Username for Basic auth to protected features. No default.
+PASSWORD=...         // Required. Password for Basic auth to protected features. No default.
+CORS_ENABLED=https://app.example.com,https://web.example.com // Required. Comma-separated
+                                                            // origin allowlist for POST /shorten.
+                                                            // Wildcard (*) origins are rejected.
 ```
+
+> `USER_NAME`, `PASSWORD`, and `CORS_ENABLED` are required at startup and must not be blank. `CORS_ENABLED` is a comma-separated list of allowed origins; wildcard (`*`) origins are rejected. There are no default credentials.
+
+> **Destination disclosure (interstitial):** every short link, including legacy
+> aliases, renders a safety page at `GET /{shortPath}` that shows the destination
+> scheme, host, and full URL before redirecting. The browser is never given a
+> redirect destination from the server until the user confirms via
+> `POST /resolve/{shortPath}`.
+>
+> **Request and field limits:** `POST /shorten` bodies are capped at 32,768 bytes
+> (returns `413` above that). Destination URLs are capped at 2,048 characters,
+> custom paths at 64, domains at 253, and strategies at 32. Anonymous shortening
+> is rate limited to 30 requests per minute per client IP (returns `429` with
+> `Retry-After: 60`). Custom paths may not collide with reserved routes
+> (`ui`, `shorten`, `resolve`, `update`, `delete`, `links`, and Swagger paths).
 
 ### Run as JAR
 

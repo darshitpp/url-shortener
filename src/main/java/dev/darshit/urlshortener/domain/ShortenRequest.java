@@ -27,6 +27,9 @@ public class ShortenRequest {
         this.url = url;
         this.options = Objects.requireNonNullElseGet(options, () -> new ShortenOptions.Builder().build());
         this.strategy = strategy;
+        if (!Validator.validateStrategy(strategy)) {
+            throw new IllegalArgumentException("Strategy must be at most 32 characters");
+        }
     }
 
     public String getUrl() {

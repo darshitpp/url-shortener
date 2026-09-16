@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Shorten a URL with an optional custom path.">
+    <title>JUST - URL Shortener</title>
+    <link rel="stylesheet" href="./styles.css">
+    <script src="./app.js" defer></script>
+</head>
+<body>
+<main class="page-shell">
+    <section class="shortener-card" aria-labelledby="page-title">
+        <p class="eyebrow">JUST / URL SHORTENER</p>
+        <h1 id="page-title">Make the long story short.</h1>
+        <p class="intro">
+            Paste a destination and optionally choose the ending.
+        </p>
+
+        <form id="shorten-form">
+            <div class="field">
+                <label for="original-url">Destination URL</label>
+                <input
+                        id="original-url"
+                        name="url"
+                        type="url"
+                        inputmode="url"
+                        autocomplete="url"
+                        maxlength="2048"
+                        placeholder="https://example.com/article"
+                        required>
+            </div>
+
+            <div class="field">
+                <label for="custom-path">
+                    Custom path <span class="optional">optional</span>
+                </label>
+                <div class="path-input">
+                    <span id="origin-prefix" class="origin-prefix" aria-hidden="true"></span>
+                    <input
+                            id="custom-path"
+                            name="customPath"
+                            type="text"
+                            pattern="[A-Za-z0-9_-]+"
+                            maxlength="64"
+                            autocomplete="off"
+                            spellcheck="false"
+                            placeholder="launch">
+                </div>
+                <p class="field-hint">Letters, numbers, hyphens, and underscores.</p>
+            </div>
+
+            <button id="shorten-button" class="primary-button" type="submit">
+                Shorten URL
+            </button>
+        </form>
+
+        <section id="result" class="result" hidden>
+            <p class="result-label">Your short link</p>
+            <a
+                    id="short-url"
+                    href="#"
+                    target="_blank"
+                    rel="noopener noreferrer"></a>
+            <button id="copy-button" class="copy-button" type="button">Copy</button>
+        </section>
+
+        <p id="status" class="status" role="status" aria-live="polite"></p>
+        <noscript>
+            <p class="status status-error">JavaScript is required to shorten URLs.</p>
+        </noscript>
+    </section>
+</main>
+</body>
+</html>

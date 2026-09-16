@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Leaving just.darshit.dev</title>
+</head>
+<body>
+<main>
+    <h1>You are leaving just.darshit.dev</h1>
+    <p th:if="${insecure}">
+        <strong>Warning:</strong> this destination does not use HTTPS.
+    </p>
+    <dl>
+        <dt>Short path</dt>
+        <dd th:text="${shortPath}">example</dd>
+        <dt>Destination scheme</dt>
+        <dd th:text="${destinationScheme}">https</dd>
+        <dt>Destination host</dt>
+        <dd th:text="${destinationHost}">example.com</dd>
+        <dt>Full destination</dt>
+        <dd><code th:text="${destination}">https://example.com</code></dd>
+    </dl>
+<form method="post" th:action="@{/resolve/{path}(path=${shortPath})}">
+    <button type="submit">Continue</button>
+</form>
+    <a href="/ui/index.html">Go back</a>
+</main>
+</body>
+</html>

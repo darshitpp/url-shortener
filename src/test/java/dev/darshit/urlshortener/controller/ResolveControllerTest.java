@@ -40,11 +40,76 @@ class ResolveControllerTest {
     }
 
     @Test
-    @DisplayName("Resolves URL successfully")
-    void should_resolve_url() throws Exception {
+    void rendersDestinationWarningWithoutRedirecting() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/{shortPath}", testKey))
-                .andExpect(MockMvcResultMatchers.redirectedUrl(originalUrl))
-                .andExpect(MockMvcResultMatchers.status().isFound());
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.header().doesNotExist("Location"))
+                .andExpect(MockMvcResultMatchers.content().string(
+                        org.hamcrest.Matchers.containsString("You are leaving just.darshit.dev")))
+                .andExpect(MockMvcResultMatchers.content().string(
+                        org.hamcrest.Matchers.containsString(originalUrl)));
+    }
+
+    @Test
+    void continuesToTheStoredDestination() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post("/resolve/{shortPath}", testKey))
+                .andExpect(MockMvcResultMatchers.status().isFound())
+                .andExpect(MockMvcResultMatchers.redirectedUrl(originalUrl));
+    }
+
+    @Test
+    void rendersSchemeAndAsciiHostForUnicodeDestination() throws Exception {
+        redisUrlOperations.putIfAbsent(
+                "unicode-destination", "https://bücher.example/path", 1);
+        mockMvc.perform(MockMvcRequestBuilders.get("/{shortPath}", "unicode-destination"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().string(
+                        org.hamcrest.Matchers.containsString("Destination scheme")))
+                .andExpect(MockMvcResultMatchers.content().string(
+                        org.hamcrest.Matchers.containsString("xn--bcher-kva.example")));
+    }
+
+    @Test
+    void preservesDestinationPortPathQueryAndFragment() throws Exception {
+        redisUrlOperations.putIfAbsent(
+                "complete-destination",
+                "https://bücher.example:8443/path?x=1#fragment",
+                1);
+        mockMvc.perform(MockMvcRequestBuilders.get(
+                        "/{shortPath}", "complete-destination"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.model().attribute(
+                        "destination",
+                        "https://xn--bcher-kva.example:8443/path?x=1#fragment"));
+    }
+
+    @Test
+    void preservesIpv6Destination() throws Exception {
+        redisUrlOperations.putIfAbsent(
+                "ipv6-destination", "http://[::1]:8080/path?x=1#fragment", 1);
+        mockMvc.perform(MockMvcRequestBuilders.get("/{shortPath}", "ipv6-destination"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.model().attribute(
+                        "destination", "http://[::1]:8080/path?x=1#fragment"));
+    }
+
+    @Test
+    void rejectsDestinationUserInfo() throws Exception {
+        redisUrlOperations.putIfAbsent(
+                "userinfo-destination",
+                "https://user:secret@example.com/path",
+                1);
+        mockMvc.perform(MockMvcRequestBuilders.get("/{shortPath}", "userinfo-destination"))
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
+    }
+
+    @Test
+    void continuationIgnoresCallerSuppliedDestination() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post("/resolve/{shortPath}", testKey)
+                        .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                        .content("{\"url\":\"https://attacker.example\"}"))
+                .andExpect(MockMvcResultMatchers.status().isFound())
+                .andExpect(MockMvcResultMatchers.redirectedUrl(originalUrl));
     }
 
     @Test

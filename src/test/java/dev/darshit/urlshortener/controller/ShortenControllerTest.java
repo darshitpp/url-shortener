@@ -6,7 +6,10 @@ import dev.darshit.urlshortener.redis.RedisUrlOperations;
 import dev.darshit.urlshortener.strategy.StrategyFactory;
 import dev.darshit.urlshortener.utils.JsonUtils;
 import dev.darshit.urlshortener.utils.StringUtils;
+import dev.darshit.urlshortener.validator.Validator;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +37,16 @@ class ShortenControllerTest {
 
     @Autowired
     private StrategyFactory strategyFactory;
+
+    @BeforeEach
+    void clearRedisBeforeTest() {
+        redisUrlOperations.flushAll();
+    }
+
+    @AfterEach
+    void clearRedisAfterTest() {
+        redisUrlOperations.flushAll();
+    }
 
     @Test
     @DisplayName("Shorten URL with Default Input")
@@ -329,5 +342,93 @@ class ShortenControllerTest {
         Assertions.assertEquals("Please pass a valid domain starting with http/https", response.getError());
         Assertions.assertNull(response.getTtlInDays());
         Assertions.assertNull(response.getShortUrl());
+    }
+
+    @Test
+    void acceptsMaximumUrlLengthAndRejectsOneMoreCharacter() throws Exception {
+        String prefix = "https://example.com/";
+        String maximumUrl = prefix + "a".repeat(Validator.MAX_URL_LENGTH - prefix.length());
+
+        shorten(maximumUrl, null, null)
+                .andExpect(MockMvcResultMatchers.status().isOk());
+        shorten(maximumUrl + "a", null, null)
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
+
+    @Test
+    void acceptsMaximumCustomPathAndRejectsOneMoreCharacter() throws Exception {
+        String maximumPath = "a".repeat(Validator.MAX_CUSTOM_PATH_LENGTH);
+
+        shorten("https://example.com", "custom",
+                "{\"customPath\":\"" + maximumPath + "\"}")
+                .andExpect(MockMvcResultMatchers.status().isOk());
+        shorten("https://example.com", "custom",
+                "{\"customPath\":\"" + maximumPath + "a\"}")
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
+
+    @Test
+    void acceptsMaximumDomainAndRejectsOneMoreCharacter() throws Exception {
+        String maximumDomain = "http://"
+                + "a".repeat(63) + "."
+                + "b".repeat(63) + "."
+                + "c".repeat(63) + "."
+                + "d".repeat(50) + ".com";
+        Assertions.assertEquals(Validator.MAX_DOMAIN_LENGTH, maximumDomain.length());
+
+        shorten("https://example.com", null,
+                "{\"domain\":\"" + maximumDomain + "\"}")
+                .andExpect(MockMvcResultMatchers.status().isOk());
+        shorten("https://example.com", null,
+                "{\"domain\":\"" + maximumDomain + "a\"}")
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser
+    void rejectsOversizedDefaultDomain() throws Exception {
+        String oversizedDomain = "http://" + "a".repeat(Validator.MAX_DOMAIN_LENGTH);
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/update/defaultDomain")
+                        .param("value", oversizedDomain)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
+
+    @Test
+    void acceptsMaximumStrategyAndRejectsOneMoreCharacter() throws Exception {
+        String maximumStrategy = "a".repeat(Validator.MAX_STRATEGY_LENGTH);
+
+        shorten("https://example.com", maximumStrategy, null)
+                .andExpect(MockMvcResultMatchers.status().isOk());
+        shorten("https://example.com", maximumStrategy + "a", null)
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
+
+    private org.springframework.test.web.servlet.ResultActions shorten(
+            String url,
+            String strategy,
+            String optionsJson) throws Exception {
+        StringBuilder body = new StringBuilder("{\"url\":\"").append(url).append("\"");
+        if (strategy != null) {
+            body.append(",\"strategy\":\"").append(strategy).append("\"");
+        }
+        if (optionsJson != null) {
+            body.append(",\"options\":").append(optionsJson);
+        }
+        body.append("}");
+
+        return mockMvc.perform(MockMvcRequestBuilders.post("/shorten")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body.toString()));
+    }
+
+    @Test
+    @WithMockUser
+    void revokesAlias() throws Exception {
+        redisUrlOperations.putIfAbsent("revoke-me", "https://example.com", 1);
+        mockMvc.perform(MockMvcRequestBuilders.delete("/links/{shortPath}", "revoke-me"))
+                .andExpect(MockMvcResultMatchers.status().isNoContent());
+        Assertions.assertTrue(redisUrlOperations.get("revoke-me").isEmpty());
     }
 }

@@ -13,6 +13,7 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
 
 import java.util.Optional;
 
@@ -52,7 +53,7 @@ public class ShortenController {
     @ApiOperation(value = "Update the Default Domain")
     @PutMapping("/update/defaultDomain")
     public void updateDefaultDomain(@RequestParam("value") String defaultDomain) {
-        if (!Validator.validateUrl(defaultDomain)) {
+        if (!Validator.validateDomain(defaultDomain)) {
             throw new IllegalArgumentException("Please pass a valid domain starting with http/https");
         } else {
             redisUrlOperations.putDefaultDomain(defaultDomain);
@@ -63,5 +64,11 @@ public class ShortenController {
     @PutMapping("/delete/defaultDomain")
     public void deleteDefaultDomain() {
         redisUrlOperations.deleteDefaultDomain();
+    }
+
+    @DeleteMapping("/links/{shortPath}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void revokeShortLink(@PathVariable String shortPath) {
+        redisUrlOperations.delete(shortPath);
     }
 }

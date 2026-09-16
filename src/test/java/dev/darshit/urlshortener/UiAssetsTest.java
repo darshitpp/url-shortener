@@ -11,6 +11,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -40,5 +41,27 @@ class UiAssetsTest {
     void stylesheetIsPublic() throws Exception {
         mockMvc.perform(get("/ui/styles.css"))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    void appJsIsPublicAndContainsCanonicalBehavior() throws Exception {
+        mockMvc.perform(get("/ui/app.js"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("fetch(\"/shorten\", {")))
+
+                .andExpect(content().string(containsString("payload.strategy = \"custom\"")))
+                .andExpect(content().string(containsString("response.status === 400")))
+                .andExpect(content().string(containsString("response.status === 413")))
+                .andExpect(content().string(containsString("response.status === 429")))
+                .andExpect(content().string(containsString(
+                        "response.headers.get(\"Retry-After\")")))
+                .andExpect(content().string(containsString(
+                        "status.textContent = message")))
+                .andExpect(content().string(containsString(
+                        "shortUrlLink.textContent = shortUrl")))
+                .andExpect(content().string(not(containsString("innerHTML"))))
+                .andExpect(content().string(containsString("new AbortController()")))
+                .andExpect(content().string(containsString(
+                        "signal: controller.signal")));
     }
 }

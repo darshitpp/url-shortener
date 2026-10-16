@@ -31,6 +31,10 @@ class UiAssetsTest {
         mockMvc.perform(get("/"))
                 .andExpect(status().isOk())
                 .andExpect(forwardedUrl("/ui/index.html"));
+        // assets must be absolute: at "/" a relative ./app.js would resolve to /app.js
+        mockMvc.perform(get("/ui/index.html"))
+                .andExpect(content().string(containsString("href=\"/ui/styles.css\"")))
+                .andExpect(content().string(containsString("src=\"/ui/app.js\"")));
     }
 
     @Test

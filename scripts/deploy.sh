@@ -10,6 +10,7 @@
 #                    read, printed or copied by this script.
 #   IMAGE_REPO       default: darshit12/url-shortener
 #   CONTAINER        default: competent_roentgen
+#   PUSHED_IMAGE     deploy this already-pushed image, skipping tests/build/push
 #   PUBLIC_URL       if set, checked after deploy, e.g. https://just.darshit.dev
 #
 # Usage: DEPLOY_HOST=user@host scripts/deploy.sh [--yes]
@@ -71,27 +72,33 @@ fi
 TAG="release-$(date -u +%Y%m%dT%H%M%SZ)-$(git rev-parse --short=12 HEAD)"
 IMAGE="$IMAGE_REPO:$TAG"
 
-echo "==> Running tests (throwaway Redis on 127.0.0.1:6379)"
-docker run -d --rm --name deploy-test-redis -p 127.0.0.1:6379:6379 redis:7-alpine >/dev/null
-trap 'docker rm -f deploy-test-redis >/dev/null 2>&1 || true' EXIT
-sleep 2
-TEST_LOG="$(mktemp)"
-./mvnw -q clean verify >"$TEST_LOG" 2>&1 || { tail -60 "$TEST_LOG" >&2; echo "Tests failed; full log: $TEST_LOG" >&2; exit 1; }
-rm -f "$TEST_LOG"
+if [ -n "${PUSHED_IMAGE:-}" ]; then
+  # Reuse an image already on the registry (e.g. pushed by hand); skips tests/build/push.
+  IMAGE="$PUSHED_IMAGE"
+else
+  echo "==> Running tests (throwaway Redis on 127.0.0.1:6379)"
+  docker run -d --rm --name deploy-test-redis -p 127.0.0.1:6379:6379 redis:7-alpine >/dev/null
+  trap 'docker rm -f deploy-test-redis >/dev/null 2>&1 || true' EXIT
+  sleep 2
+  TEST_LOG="$(mktemp)"
+  ./mvnw -q clean verify >"$TEST_LOG" 2>&1 || { tail -60 "$TEST_LOG" >&2; echo "Tests failed; full log: $TEST_LOG" >&2; exit 1; }
+  rm -f "$TEST_LOG"
 
-echo "==> Building $IMAGE"
-./mvnw -q -DskipTests -Djib.to.image="$IMAGE" compile jib:dockerBuild >/dev/null
-# Podman names the local image localhost/<name>, but `docker push` then looks for
-# docker.io/<name>. Add that tag if it is missing (a no-op alias on real Docker).
-docker image inspect "docker.io/$IMAGE" >/dev/null 2>&1 || docker tag "$IMAGE" "docker.io/$IMAGE"
+  echo "==> Building $IMAGE"
+  ./mvnw -q -DskipTests -Djib.to.image="$IMAGE" compile jib:dockerBuild >/dev/null
+  # Podman names the local image localhost/<name>, but `docker push` then looks for
+  # docker.io/<name>. Add that tag if it is missing (a no-op alias on real Docker).
+  docker image inspect "docker.io/$IMAGE" >/dev/null 2>&1 || docker tag "$IMAGE" "docker.io/$IMAGE"
 
-if [ "$ASSUME_YES" != true ]; then
-  read -r -p "Push $IMAGE and deploy to the VM? [y/N] " answer
-  [ "$answer" = y ] || { echo "Aborted."; exit 1; }
+  if [ "$ASSUME_YES" != true ]; then
+    read -r -p "Push $IMAGE and deploy to the VM? [y/N] " answer
+    [ "$answer" = y ] || { echo "Aborted."; exit 1; }
+  fi
+
+  echo "==> Pushing"
+  docker push "$IMAGE"
+
 fi
-
-echo "==> Pushing"
-docker push "$IMAGE"
 
 echo "==> Deploying"
 ssh_vm bash -s -- "$CONTAINER" "$IMAGE" "$DEPLOY_ENV_FILE" <<'REMOTE'

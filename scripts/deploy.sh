@@ -75,10 +75,15 @@ echo "==> Running tests (throwaway Redis on 127.0.0.1:6379)"
 docker run -d --rm --name deploy-test-redis -p 127.0.0.1:6379:6379 redis:7-alpine >/dev/null
 trap 'docker rm -f deploy-test-redis >/dev/null 2>&1 || true' EXIT
 sleep 2
-./mvnw -q clean verify
+TEST_LOG="$(mktemp)"
+./mvnw -q clean verify >"$TEST_LOG" 2>&1 || { tail -60 "$TEST_LOG" >&2; echo "Tests failed; full log: $TEST_LOG" >&2; exit 1; }
+rm -f "$TEST_LOG"
 
 echo "==> Building $IMAGE"
-./mvnw -q -DskipTests -Djib.to.image="$IMAGE" compile jib:dockerBuild
+./mvnw -q -DskipTests -Djib.to.image="$IMAGE" compile jib:dockerBuild >/dev/null
+# Podman names the local image localhost/<name>, but `docker push` then looks for
+# docker.io/<name>. Add that tag if it is missing (a no-op alias on real Docker).
+docker image inspect "docker.io/$IMAGE" >/dev/null 2>&1 || docker tag "$IMAGE" "docker.io/$IMAGE"
 
 if [ "$ASSUME_YES" != true ]; then
   read -r -p "Push $IMAGE and deploy to the VM? [y/N] " answer

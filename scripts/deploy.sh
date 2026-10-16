@@ -98,7 +98,7 @@ else
   echo "==> Pushing"
   # Fully qualified name: podman otherwise resolves the short name against localhost/.
   docker push "docker.io/$IMAGE" || {
-    echo "Push denied. After a podman VM restart the stored login can go stale. Fix, then redeploy:" >&2
+    echo "Push denied (plain `docker push` ignores the stored login; `--creds` works). Fix, then redeploy:" >&2
     echo "  docker push --creds <hub-user> docker.io/$IMAGE" >&2
     echo "  PUSHED_IMAGE=$IMAGE DEPLOY_HOST=... scripts/deploy.sh --yes" >&2
     exit 1

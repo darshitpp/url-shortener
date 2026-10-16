@@ -47,7 +47,9 @@ class ResolveControllerTest {
                 .andExpect(MockMvcResultMatchers.content().string(
                         org.hamcrest.Matchers.containsString("You are leaving just.darshit.dev")))
                 .andExpect(MockMvcResultMatchers.content().string(
-                        org.hamcrest.Matchers.containsString(originalUrl)));
+                        org.hamcrest.Matchers.containsString(originalUrl)))
+                .andExpect(MockMvcResultMatchers.content().string(
+                        org.hamcrest.Matchers.containsString("href=\"/\"")));
     }
 
     @Test
@@ -116,7 +118,9 @@ class ResolveControllerTest {
     @DisplayName("Returns 404 on invalid resolution")
     void return_404_invalid_resolution() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/{shortPath}", testIncorrectKey))
-                .andExpect(MockMvcResultMatchers.status().isNotFound());
+                .andExpect(MockMvcResultMatchers.status().isNotFound())
+                .andExpect(MockMvcResultMatchers.content().string(
+                        org.hamcrest.Matchers.containsString("href=\"/\"")));
     }
 
 

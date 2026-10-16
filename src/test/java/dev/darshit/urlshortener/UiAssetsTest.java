@@ -38,6 +38,16 @@ class UiAssetsTest {
     }
 
     @Test
+    void faviconIsServedWithoutALookup() throws Exception {
+        mockMvc.perform(get("/favicon.ico"))
+                .andExpect(status().isOk())
+                .andExpect(forwardedUrl("/ui/favicon.png"));
+        mockMvc.perform(get("/ui/favicon.png"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.IMAGE_PNG));
+    }
+
+    @Test
     void uiPageIsPublicAndContainsShorteningForm() throws Exception {
         mockMvc.perform(get("/ui/index.html"))
                 .andExpect(status().isOk())

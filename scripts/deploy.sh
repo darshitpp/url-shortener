@@ -13,6 +13,8 @@
 #   PUBLIC_URL       if set, checked after deploy, e.g. https://just.darshit.dev
 #
 # Usage: DEPLOY_HOST=user@host scripts/deploy.sh [--yes]
+#        DEPLOY_HOST=user@host scripts/deploy.sh --rollback
+#   --rollback swaps the live container for <name>_prev (kept by the last deploy).
 #
 # Flow: tests -> build -> push -> pull on VM -> keep the old container as
 # <name>_prev -> start new -> readiness check -> automatic rollback on failure.
@@ -23,19 +25,51 @@ IMAGE_REPO="${IMAGE_REPO:-darshit12/url-shortener}"
 CONTAINER="${CONTAINER:-competent_roentgen}"
 DEPLOY_ENV_FILE="${DEPLOY_ENV_FILE:-/root/url-shortener.env}"
 ASSUME_YES=false
-[ "${1:-}" = "--yes" ] && ASSUME_YES=true
+ROLLBACK=false
+case "${1:-}" in
+  --yes) ASSUME_YES=true ;;
+  --rollback) ROLLBACK=true ;;
+  "") ;;
+  *) echo "Unknown option: $1" >&2; exit 2 ;;
+esac
 
 cd "$(git rev-parse --show-toplevel)"
+
+ssh_vm() {
+  ssh ${DEPLOY_SSH_KEY:+-i "$DEPLOY_SSH_KEY"} -o BatchMode=yes -o ConnectTimeout=10 "$DEPLOY_HOST" "$@"
+}
+
+if [ "$ROLLBACK" = true ]; then
+  if [ "$ASSUME_YES" != true ]; then
+    read -r -p "Roll back ${CONTAINER} to ${CONTAINER}_prev? [y/N] " answer
+    [ "$answer" = y ] || { echo "Aborted."; exit 1; }
+  fi
+  ssh_vm bash -s -- "$CONTAINER" <<'REMOTE'
+set -euo pipefail
+name=$1
+prev="${name}_prev"
+sudo docker inspect "$prev" >/dev/null 2>&1 || { echo "no $prev container to roll back to" >&2; exit 1; }
+sudo docker rm -f "$name" >/dev/null 2>&1 || true
+sudo docker rename "$prev" "$name"
+sudo docker start "$name" >/dev/null
+for _ in $(seq 1 45); do
+  if curl -fsS -o /dev/null http://127.0.0.1:8080/ui/index.html 2>/dev/null; then
+    echo "rolled back: $name now runs $(sudo docker inspect "$name" --format '{{.Config.Image}}')"
+    exit 0
+  fi
+  sleep 2
+done
+echo "rolled back but NOT READY; check: sudo docker logs $name" >&2
+exit 1
+REMOTE
+  exit 0
+fi
 
 [ -z "$(git status --porcelain --untracked-files=no)" ] \
   || { echo "Uncommitted changes; commit first." >&2; exit 1; }
 
 TAG="release-$(date -u +%Y%m%dT%H%M%SZ)-$(git rev-parse --short=12 HEAD)"
 IMAGE="$IMAGE_REPO:$TAG"
-
-ssh_vm() {
-  ssh ${DEPLOY_SSH_KEY:+-i "$DEPLOY_SSH_KEY"} -o BatchMode=yes -o ConnectTimeout=10 "$DEPLOY_HOST" "$@"
-}
 
 echo "==> Running tests (throwaway Redis on 127.0.0.1:6379)"
 docker run -d --rm --name deploy-test-redis -p 127.0.0.1:6379:6379 redis:7-alpine >/dev/null

@@ -26,6 +26,12 @@ public class ResolveController {
         this.fetcher = fetcher;
     }
 
+    // Explicit route: otherwise /favicon.ico is treated as a short path (Redis lookup, then 404).
+    @GetMapping("/favicon.ico")
+    public String favicon() {
+        return "forward:/ui/favicon.png";
+    }
+
     @GetMapping("/{shortPath}")
     public ModelAndView resolve(
             @PathVariable String shortPath,

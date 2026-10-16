@@ -37,7 +37,7 @@ function normalizeShortUrl(value) {
         return value;
     }
 
-    return new URL(value.replace(/^\/+/, ""), `${window.location.origin}/`).toString());
+    return new URL(value.replace(/^\/+/, ""), `${window.location.origin}/`).toString();
 }
 
 function showResult(shortUrl) {

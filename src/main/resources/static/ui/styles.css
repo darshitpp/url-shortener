@@ -135,13 +135,13 @@ input:focus {
 
 .origin-prefix {
     display: block;
-    max-width: 55%;
+    flex: none;
     padding-left: 1rem;
     overflow: hidden;
     color: var(--muted);
     font-size: 0.9rem;
-    text-overflow: ellipsis;
     white-space: nowrap;
+    user-select: none;
 }
 
 .field-hint {

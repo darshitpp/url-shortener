@@ -12,7 +12,7 @@ const MAX_URL_LENGTH = 2048;
 const MAX_CUSTOM_PATH_LENGTH = 64;
 const REQUEST_TIMEOUT_MS = 10000;
 
-originPrefix.textContent = `${window.location.origin}/`;
+originPrefix.textContent = `${window.location.host}/`;
 
 function setStatus(message, kind = "") {
     status.textContent = message;

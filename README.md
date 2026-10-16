@@ -110,7 +110,7 @@ CORS_ENABLED=https://app.example.com,https://web.example.com // Required. Comma-
                                                             // Wildcard (*) origins are rejected.
 ```
 
-> `USER_NAME`, `PASSWORD`, and `CORS_ENABLED` are required at startup and must not be blank. `CORS_ENABLED` is a comma-separated list of allowed origins; wildcard (`*`) origins are rejected. There are no default credentials.
+> `USER_NAME`, `PASSWORD`, and `CORS_ENABLED` are required at startup and must not be blank. `CORS_ENABLED` is a comma-separated list of allowed origins; wildcard (`*`) origins are rejected. When the app is served behind an HTTPS proxy, include its own public origin (e.g. `https://just.darshit.dev`), otherwise the built-in UI's `POST /shorten` is rejected with `403 Invalid CORS request`. There are no default credentials.
 
 > **Destination disclosure (interstitial):** every short link, including legacy
 > aliases, renders a safety page at `GET /{shortPath}` that shows the destination

@@ -73,6 +73,9 @@ public class ShortenResponse {
         public String buildShortUrl() {
             String domain = getDomain();
             String url = getShortUrl();
+            if (url == null) {
+                return null;
+            }
             if (!StringUtils.isEmpty(domain)) {
                 if (domain.endsWith("/")) {
                     url = domain + getShortUrl();

@@ -54,6 +54,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
 
     private static final String[] WHITELIST = {
+            "/",
             "/shorten",
             "/resolve/{shortPath}",
             "/ui/**",

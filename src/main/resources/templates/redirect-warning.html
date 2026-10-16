@@ -1,31 +1,47 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en" xmlns:th="https://www.thymeleaf.org">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Leaving just.darshit.dev</title>
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23d95530'/%3E%3Ctext x='16' y='23' font-size='20' font-family='Georgia,serif' font-weight='bold' text-anchor='middle' fill='white'%3EJ%3C/text%3E%3C/svg%3E">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Confirm redirect – JUST</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23d95530'/%3E%3Ctext x='16' y='23' font-size='20' font-family='Georgia,serif' font-weight='bold' text-anchor='middle' fill='white'%3EJ%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/ui/pages.css">
 </head>
 <body>
-<main>
-    <h1>You are leaving just.darshit.dev</h1>
-    <p th:if="${insecure}">
-        <strong>Warning:</strong> this destination does not use HTTPS.
-    </p>
-    <dl>
-        <dt>Short path</dt>
-        <dd th:text="${shortPath}">example</dd>
-        <dt>Destination scheme</dt>
-        <dd th:text="${destinationScheme}">https</dd>
-        <dt>Destination host</dt>
-        <dd th:text="${destinationHost}">example.com</dd>
-        <dt>Full destination</dt>
-        <dd><code th:text="${destination}">https://example.com</code></dd>
-    </dl>
-<form method="post" th:action="@{/resolve/{path}(path=${shortPath})}">
-    <button type="submit">Continue</button>
-</form>
-    <a href="/ui/index.html">Go back</a>
-</main>
+  <div class="page-wrapper">
+    <div class="card">
+      <span class="eyebrow">JUST / URL SHORTENER</span>
+      <h1>You are leaving just.darshit.dev</h1>
+
+      <div class="destination-info">
+        <div class="destination-host" th:text="${destinationHost}">example.com</div>
+        <div class="destination-url" th:text="${destination}">https://example.com/very/long/path</div>
+
+        <div class="destination-meta">
+          <div class="meta-item">
+            <span class="meta-label">Scheme</span>
+            <span class="meta-value" th:text="${destinationScheme}">https</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Short path</span>
+            <span class="meta-value" th:text="${shortPath}">abc123</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="warning-banner" th:if="${insecure}">
+        This destination does not use HTTPS.
+      </div>
+
+      <p class="reassurance">We never redirect without your confirmation.</p>
+
+      <form method="post" th:action="@{/resolve/{path}(path=${shortPath})}">
+        <div class="actions">
+          <button type="submit" class="btn btn-primary">Continue</button>
+          <a href="/ui/index.html" class="btn btn-secondary">Go back</a>
+        </div>
+      </form>
+    </div>
+  </div>
 </body>
 </html>

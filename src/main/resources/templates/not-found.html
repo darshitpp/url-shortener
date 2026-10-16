@@ -1,16 +1,27 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Short link not found</title>
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23d95530'/%3E%3Ctext x='16' y='23' font-size='20' font-family='Georgia,serif' font-weight='bold' text-anchor='middle' fill='white'%3EJ%3C/text%3E%3C/svg%3E">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Not found – JUST</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23d95530'/%3E%3Ctext x='16' y='23' font-size='20' font-family='Georgia,serif' font-weight='bold' text-anchor='middle' fill='white'%3EJ%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/ui/pages.css">
 </head>
 <body>
-<main>
-    <h1>Short link not found</h1>
-    <p>This short link does not exist or was removed.</p>
-    <a href="/ui/index.html">Create a new short link</a>
-</main>
+  <div class="page-wrapper">
+    <div class="card">
+      <div class="illustration">
+        <span class="icon-404">?</span>
+      </div>
+
+      <h2>Short link not found</h2>
+
+      <p class="error-text">This short link does not exist or was removed.</p>
+
+      <div class="actions">
+        <a href="/ui/index.html" class="btn btn-primary">Create a new short link</a>
+      </div>
+    </div>
+  </div>
 </body>
 </html>

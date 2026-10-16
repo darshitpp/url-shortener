@@ -64,7 +64,7 @@ class ResolveControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/{shortPath}", "unicode-destination"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().string(
-                        org.hamcrest.Matchers.containsString("Destination scheme")))
+                        org.hamcrest.Matchers.containsString("Scheme")))
                 .andExpect(MockMvcResultMatchers.content().string(
                         org.hamcrest.Matchers.containsString("xn--bcher-kva.example")));
     }
